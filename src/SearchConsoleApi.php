@@ -104,27 +104,30 @@ class SearchConsoleApi extends Google_Service_Webmasters {
    * @param array $options
    * @return array
    */
-   */
+  
   public function getRows($options) {
 
-    $this->initNewConnection();
+  $this->initNewConnection();
     $this->setQueryOptions($options);
 
-     $result="";
-     $error="";
-      try {
-        $result = $this->searchanalytics->query($options['site_url'], $this->query);
-      }
-      catch (\Google_Service_Exception $e) {
-       $error=$e->getMessage();   
-      }
-      
-      if (empty($error)){
-        $rows = $result->getRows();
-        return json_encode($rows,true);
-      }else{
-        $rows ="";
-        return json_encode($rows,true);
-      }
-    
+    $result="";
+    $rows="";
+    $coincidencia ="";
+    $arrayError=[];
+    $error="";
+
+     try {
+       $result = $this->searchanalytics->query($options['site_url'], $this->query);
+       $rows = $result->getRows();
+       return json_encode($rows,true);
+     }catch (\Google_Service_Exception $e) {
+      $error=$e->getMessage();
+      $coincidencia = strpos($error,"Not a valid email or user ID");
+        if($coincidencia != false) {
+          array_push($arrayError,"2");
+        }
+          array_push($arrayError,"0");
+         return $arrayError[0];
+     }
+    }
 }
